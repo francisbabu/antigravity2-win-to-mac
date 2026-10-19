@@ -1,0 +1,20 @@
+# OS metadata
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Migration archives & database files (never commit personal session data!)
+*.tar.gz
+*.tgz
+*.zip
+*.db
+*.db-shm
+*.db-wal
+*.pb
+*.pbtxt
+migration-manifest.json
+
+# Backups & scratch
+backups/
+backup-*/
+.gemini/
