@@ -19,7 +19,7 @@
     Destination path for the .tar.gz archive. Defaults to Desktop\antigravity-mac-migration.tar.gz.
 
 .PARAMETER Exclude
-    Additional directory or plugin names to exclude from the archive.
+    Additional directory or plugin names to exclude from the archive (defaults to none).
 
 .PARAMETER NoKill
     Skip stopping Antigravity and language_server processes.
@@ -31,7 +31,7 @@
     .\export-antigravity.ps1
 
 .EXAMPLE
-    .\export-antigravity.ps1 -OutputPath "D:\Backups\antigravity-mac-migration.tar.gz" -Exclude @("understand-anything-plugin","understand-anything") -NonInteractive
+    .\export-antigravity.ps1 -OutputPath "D:\Backups\antigravity-mac-migration.tar.gz" -Exclude @("custom-plugin-to-exclude") -NonInteractive
 #>
 
 [CmdletBinding()]
@@ -43,7 +43,7 @@ param(
     [string]$OutputPath = "",
 
     [Parameter(Mandatory = $false)]
-    [string[]]$Exclude = @("understand-anything-plugin", "understand-anything"),
+    [string[]]$Exclude = @(),
 
     [Parameter(Mandatory = $false)]
     [switch]$NoKill,
@@ -89,7 +89,43 @@ if ([string]::IsNullOrWhiteSpace($OutputPath)) {
 
 Write-Host "  Source (.gemini) : $GeminiRoot" -ForegroundColor Gray
 Write-Host "  Output Archive   : $OutputPath" -ForegroundColor Gray
+if ($Exclude -and $Exclude.Count -gt 0) {
+    Write-Host "  Exclusions       : $($Exclude -join ', ')" -ForegroundColor Gray
+}
 Write-Host ""
+
+# Check if any excluded plugin or path exists; warn if not found
+if ($Exclude -and $Exclude.Count -gt 0) {
+    $searchDirs = @(
+        (Join-Path $GeminiRoot "config\plugins"),
+        (Join-Path $GeminiRoot "antigravity\skills"),
+        (Join-Path $GeminiRoot "antigravity\plugin_data")
+    )
+    foreach ($ex in $Exclude) {
+        if ([string]::IsNullOrWhiteSpace($ex)) { continue }
+        $found = $false
+        foreach ($dir in $searchDirs) {
+            if (Test-Path -LiteralPath $dir) {
+                $matched = Get-ChildItem -LiteralPath $dir -Force -ErrorAction SilentlyContinue | Where-Object {
+                    $_.Name -like "$ex*"
+                }
+                if ($matched) {
+                    $found = $true
+                    break
+                }
+            }
+        }
+        if (-not $found) {
+            $rootDirect = Join-Path $GeminiRoot ($ex -replace '/', '\')
+            if (Test-Path -LiteralPath $rootDirect) {
+                $found = $true
+            }
+        }
+        if (-not $found) {
+            Write-Warning "Plugin or path '$ex' specified in -Exclude was not found in '$GeminiRoot'. Continuing execution..."
+        }
+    }
+}
 
 # ---------------------------------------------------------------------------
 # Step 1: Stop Antigravity and language_server cleanly to flush SQLite WAL

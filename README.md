@@ -1,10 +1,10 @@
 # Antigravity 2.0: Windows to macOS Migration Tool (`antigravity2-win-to-mac`)
 
-Seamlessly migrate your **Google Antigravity 2.0 (AGY 2.0)** workspaces, project conversations, brain artifacts (`task.md`, `implementation_plan.md`, `walkthrough.md`), MCP server configs, custom skills, and folder permissions from **Windows 11/10** to **macOS**.
+Seamlessly migrate your **Google Antigravity 2.0 (AGY 2.0)** workspaces, project conversations, brain artifacts (`task.md`, `implementation_plan.md`, `walkthrough.md`), MCP server configs, custom skills, and folder permissions from **Windows 11** to **macOS**.
 
 ---
 
-## ✨ Key Features
+## Key Features
 
 - **Multi-Drive Windows Path Mapping**: Automatically scans your exported project configurations to detect projects across multiple Windows drives (`C:\Repos`, `D:\Projects`, `E:\Work`, etc.) and prompts you to map each one to its new macOS folder.
 - **Interactive & CLI Modes**: Run without arguments for a guided interactive prompt, or pass CLI flags (`--map`, `--archive`, `--non-interactive`) for automated setups.
@@ -16,7 +16,7 @@ Seamlessly migrate your **Google Antigravity 2.0 (AGY 2.0)** workspaces, project
 
 ---
 
-## 📂 Repository Structure
+## Repository Structure
 
 ```text
 antigravity2-win-to-mac/
@@ -34,7 +34,7 @@ antigravity2-win-to-mac/
 
 ---
 
-## 🚀 Step-by-Step Usage
+## Step-by-Step Usage
 
 ### Step 1: Export on Windows
 
@@ -49,7 +49,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\windows\export-antigr
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\windows\export-antigravity.ps1" `
   -OutputPath "$HOME\Desktop\antigravity-mac-migration.tar.gz" `
-  -Exclude @("understand-anything-plugin", "understand-anything") `
+  -Exclude @("custom-plugin-to-exclude") `
   -NonInteractive
 ```
 
@@ -102,7 +102,21 @@ Discovered 2 Windows project root directory(s) across your drives:
 
   Add another Windows drive/folder mapping? [y/N]: n
 
+[6/6] Rewriting Windows paths to macOS paths in JSON configuration files...
+  + Mapping 'D:\Projects' -> '/Users/you/Developer/projects'
+  + Mapping 'C:\Repos\Work' -> '/Users/you/Developer/work'
+  + Mapping 'C:\Users\YourName' -> '/Users/you'
+
 Also update clickable file:/// links inside brain/*.md artifacts? [Y/n]: y
+  + Updating markdown links in 142 brain artifact files...
+
+  + Verified conversation_summaries.db (28 conversations indexed)
+
+==============================================================
+   SUCCESS! Antigravity 2.0 migration to macOS is complete.
+==============================================================
+  Backup saved at: /Users/you/.gemini/backup-20261019-143000
+  Launching Antigravity.app...
 ```
 
 #### Non-Interactive CLI Mode (Multiple Drives)
@@ -122,7 +136,7 @@ You can also pass all mappings directly via repeatable `--map` flags:
 
 ---
 
-## 🛠️ Companion Utilities & Troubleshooting
+## Companion Utilities & Troubleshooting
 
 ### 1. Projects appear in the sidebar on Mac, but conversations inside each project are missing
 On macOS, Antigravity keeps a background `language_server` process running in the menu bar tray (`runInBackground = true`). If an older background process was running before migration, it may hold an empty in-memory cache (`resident: 0 -> 0`) or overwrite `agyhub_summaries_proto.pb` when closed normally.
@@ -150,12 +164,12 @@ bash macos/import-antigravity-mac.sh
 
 ---
 
-## 📖 How It Works Under the Hood
+## How It Works Under the Hood
 
 See [docs/HOW_IT_WORKS.md](docs/HOW_IT_WORKS.md) for a technical breakdown of Antigravity 2.0's SQLite WAL databases, binary Protobuf summary store, and macOS background daemon behavior.
 
 ---
 
-## 📄 License
+## License
 
 Released under the [MIT License](LICENSE).
