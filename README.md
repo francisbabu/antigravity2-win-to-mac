@@ -173,3 +173,11 @@ See [docs/HOW_IT_WORKS.md](docs/HOW_IT_WORKS.md) for a technical breakdown of An
 ## License
 
 Released under the [MIT License](LICENSE).
+
+---
+
+## 📝 Roadmap / To-Do
+
+- [ ] Migrate Antigravity CLI artifacts
+- [ ] Migrate Antigravity IDE artifacts
+
